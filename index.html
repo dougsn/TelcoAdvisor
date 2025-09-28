@@ -1,757 +1,444 @@
 <!DOCTYPE html>
 <html lang="pt-BR" class="scroll-smooth">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TelcoAdvisor - IA Proativa para Recorrência</title>
-    <link
-      rel="icon"
-      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%230077b6'/%3E%3Ctext x='50' y='65' font-size='50' fill='white' text-anchor='middle' font-family='sans-serif' font-weight='bold'%3ET%3C/text%3E%3C/svg%3E"
-    />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%230077b6'/%3E%3Ctext x='50' y='65' font-size='50' fill='white' text-anchor='middle' font-family='sans-serif' font-weight='bold'%3ET%3C/text%3E%3C/svg%3E">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap"
-      rel="stylesheet"
-    />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-      body {
-        font-family: "Inter", sans-serif;
-        background-color: #f8f7f4;
-        color: #3f3c3a;
-      }
-      .telco-accent {
-        color: #0077b6;
-      }
-      .telco-bg-accent {
-        background-color: #0077b6;
-      }
-      .telco-bg-accent-light {
-        background-color: #e6f6ff;
-      }
-      .telco-border-accent {
-        border-color: #0077b6;
-      }
-      .card-hover-effect {
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-      }
-      .card-hover-effect:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
-          0 4px 6px -2px rgba(0, 0, 0, 0.05);
-      }
-      .journey-btn.active {
-        background-color: #0077b6;
-        color: white;
-      }
-      .chart-container {
-        position: relative;
-        width: 100%;
-        max-width: 500px;
-        margin-left: auto;
-        margin-right: auto;
-        height: 320px;
-        max-height: 350px;
-      }
-      @media (min-width: 768px) {
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f7f4;
+            color: #3f3c3a;
+        }
+        .telco-accent {
+            color: #0077b6;
+        }
+        .telco-bg-accent {
+            background-color: #0077b6;
+        }
+        .telco-bg-accent-light {
+            background-color: #e6f6ff;
+        }
+        .telco-border-accent {
+            border-color: #0077b6;
+        }
+        .card-hover-effect {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card-hover-effect:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .journey-btn.active {
+            background-color: #0077b6;
+            color: white;
+        }
         .chart-container {
-          height: 350px;
-          max-height: 400px;
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 280px;
+            max-height: 300px;
         }
-      }
-      .phone-mockup {
-        width: 320px;
-        height: 640px;
-        background-color: #111827;
-        border-radius: 40px;
-        padding: 12px;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-      }
-      .phone-screen {
-        background-color: #e5ddd5;
-        background-image: url("https://i.pinimg.com/736x/8c/98/99/8c98994518b575bfd8c949e91d20548b.jpg");
-        background-position: center;
-        background-size: cover;
-        height: 100%;
-        width: 100%;
-        border-radius: 30px;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-      }
-      .chat-bubble {
-        opacity: 0;
-        transform: translateY(20px);
-        animation: bubble-in 0.5s forwards;
-      }
-      .chat-bubble-grace {
-        background-color: #ffffff;
-        align-self: flex-start;
-      }
-      .chat-bubble-user {
-        background-color: #dcf8c6;
-        align-self: flex-end;
-      }
-      @keyframes bubble-in {
-        to {
-          opacity: 1;
-          transform: translateY(0);
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+                max-height: 400px;
+            }
         }
-      }
-      .typing-indicator span {
-        animation: typing-dots 1.4s infinite;
-        opacity: 0;
-      }
-      .typing-indicator span:nth-child(2) {
-        animation-delay: 0.2s;
-      }
-      .typing-indicator span:nth-child(3) {
-        animation-delay: 0.4s;
-      }
-      @keyframes typing-dots {
-        0%,
-        100% {
-          opacity: 0;
+        .phone-mockup {
+            width: 320px;
+            height: 640px;
+            background-color: #111827;
+            border-radius: 40px;
+            padding: 12px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
         }
-        50% {
-          opacity: 1;
+        .phone-screen {
+            background-color: #e5ddd5;
+            background-image: url('https://i.pinimg.com/736x/8c/98/99/8c98994518b575bfd8c949e91d20548b.jpg');
+            background-position: center;
+            background-size: cover;
+            height: 100%;
+            width: 100%;
+            border-radius: 30px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
-      }
+        .chat-bubble {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: bubble-in 0.5s forwards;
+        }
+        .chat-bubble-grace {
+            background-color: #ffffff;
+            align-self: flex-start;
+        }
+        .chat-bubble-user {
+            background-color: #dcf8c6;
+            align-self: flex-end;
+        }
+        @keyframes bubble-in {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .typing-indicator span {
+            animation: typing-dots 1.4s infinite;
+            opacity: 0;
+        }
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typing-dots {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
     </style>
-  </head>
-  <body class="antialiased">
+</head>
+<body class="antialiased">
+
     <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
-      <nav
-        class="container mx-auto px-6 py-4 flex justify-between items-center"
-      >
-        <div class="text-2xl font-bold">
-          <span class="telco-accent">Telco</span>Advisor
-        </div>
-        <div class="hidden md:flex space-x-8">
-          <a href="#desafio" class="hover:text-blue-600 transition-colors"
-            >O Desafio</a
-          >
-          <a href="#solucao" class="hover:text-blue-600 transition-colors"
-            >A Solução</a
-          >
-          <a href="#jornadas" class="hover:text-blue-600 transition-colors"
-            >Jornadas</a
-          >
-          <a href="#metricas" class="hover:text-blue-600 transition-colors"
-            >Métricas</a
-          >
-        </div>
-      </nav>
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="text-2xl font-bold">
+                <span class="telco-accent">Telco</span>Advisor
+            </div>
+            <div class="hidden md:flex space-x-8">
+                <a href="#desafio" class="hover:text-blue-600 transition-colors">O Desafio</a>
+                <a href="#solucao" class="hover:text-blue-600 transition-colors">A Solução</a>
+                <a href="#jornadas" class="hover:text-blue-600 transition-colors">Jornadas</a>
+                <a href="#metricas" class="hover:text-blue-600 transition-colors">Métricas</a>
+            </div>
+        </nav>
     </header>
 
     <main>
-      <section id="hero" class="py-20 md:py-32">
-        <div class="container mx-auto px-6 text-center">
-          <h1 class="text-4xl md:text-6xl font-bold leading-tight mb-4">
-            Revolucione a Retenção e a Recorrência
-          </h1>
-          <p class="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
-            TelcoAdvisor utiliza IA proativa para transformar a jornada de
-            pagamento em telecom, convertendo momentos de crise em oportunidades
-            de fidelização.
-          </p>
-        </div>
-      </section>
+        <section id="hero" class="py-20 md:py-32">
+            <div class="container mx-auto px-6 text-center">
+                <h1 class="text-4xl md:text-6xl font-bold leading-tight mb-4">Revolucione a Retenção e a Recorrência</h1>
+                <p class="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">TelcoAdvisor utiliza IA proativa para transformar a jornada de pagamento em telecom, convertendo momentos de crise em oportunidades de fidelização.</p>
+            </div>
+        </section>
 
-      <section id="desafio" class="py-16 bg-white">
-        <div class="container mx-auto px-6">
-          <div class="text-center mb-12">
-            <h2 class="text-3xl md:text-4xl font-bold">
-              O Desafio: Uma Fricção de Dois Lados
-            </h2>
-            <p class="mt-4 text-gray-600 max-w-2xl mx-auto">
-              A perda de recorrência em telecomunicações nasce de um conflito
-              entre as necessidades do cliente e os objetivos da operadora.
-              Identificamos as dores de cada lado para criar uma solução que
-              beneficia ambos.
-            </p>
-          </div>
-          <div class="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-            <div class="bg-rose-50 p-8 rounded-lg border border-rose-200">
-              <h3
-                class="text-2xl font-bold text-rose-800 mb-4 flex items-center"
-              >
-                <span class="text-3xl mr-3">😟</span> A Dor do Cliente
-              </h3>
-              <ul class="space-y-3 text-gray-700 list-inside">
-                <li>
-                  <span class="font-semibold text-rose-700"
-                    >Conexão Interrompida:</span
-                  >
-                  Clientes pré-pagos ficam offline em momentos críticos.
-                </li>
-                <li>
-                  <span class="font-semibold text-rose-700"
-                    >Surpresas no Limite:</span
-                  >
-                  Usuários pós-pagos atingem o limite de dados de forma
-                  inesperada.
-                </li>
-                <li>
-                  <span class="font-semibold text-rose-700"
-                    >Processo de Recarga:</span
-                  >
-                  A necessidade de recarregar manualmente gera fricção e pode
-                  ser esquecida.
-                </li>
-              </ul>
-            </div>
-            <div class="bg-blue-50 p-8 rounded-lg border border-blue-200">
-              <h3
-                class="text-2xl font-bold text-blue-800 mb-4 flex items-center"
-              >
-                <span class="text-3xl mr-3">🏢</span> A Dor da Operadora
-              </h3>
-              <ul class="space-y-3 text-gray-700 list-inside">
-                <li>
-                  <span class="font-semibold text-blue-700"
-                    >Clientes Esporádicos:</span
-                  >
-                  Alta taxa de clientes que não geram receita previsível.
-                </li>
-                <li>
-                  <span class="font-semibold text-blue-700"
-                    >Perda de Receita:</span
-                  >
-                  Prejuízos significativos por inadimplência e cancelamentos
-                  (churn).
-                </li>
-                <li>
-                  <span class="font-semibold text-blue-700"
-                    >Custo de Retenção:</span
-                  >
-                  Altas despesas para reter clientes e renegociar dívidas.
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="solucao" class="py-16">
-        <div class="container mx-auto px-6">
-          <div class="text-center mb-12">
-            <h2 class="text-3xl md:text-4xl font-bold">
-              A Solução: Um Ecossistema de IA Integrado
-            </h2>
-            <p class="mt-4 text-gray-600 max-w-2xl mx-auto">
-              Para resolver o desafio, criamos um ecossistema inteligente que
-              opera de forma proativa. Cada componente tem um papel crucial na
-              jornada do cliente. Clique nos componentes para saber mais.
-            </p>
-          </div>
-
-          <div
-            class="max-w-4xl mx-auto grid md:grid-cols-3 gap-4 text-center items-center"
-          >
-            <div
-              class="solution-component p-6 rounded-lg cursor-pointer card-hover-effect bg-white"
-              data-target="telcoadvisor"
-            >
-              <div class="text-5xl mb-4">🧠</div>
-              <h3 class="text-xl font-bold">TelcoAdvisor</h3>
-              <p class="text-gray-500 text-sm">Motor de IA</p>
-            </div>
-            <div class="text-2xl text-gray-400 font-bold hidden md:block">
-              ➔
-            </div>
-            <div
-              class="solution-component p-6 rounded-lg cursor-pointer card-hover-effect bg-white"
-              data-target="grace"
-            >
-              <div class="text-5xl mb-4">💬</div>
-              <h3 class="text-xl font-bold">Grace</h3>
-              <p class="text-gray-500 text-sm">Agente Conversacional</p>
-            </div>
-            <div
-              class="col-span-1 md:col-span-3 text-2xl text-gray-400 font-bold text-center my-4 md:hidden"
-            >
-              ↓
-            </div>
-            <div
-              class="col-span-1 md:col-start-2 md:col-span-1 text-2xl text-gray-400 font-bold text-center my-4 hidden md:block"
-            >
-              ↓
-            </div>
-            <div
-              class="col-span-1 md:col-start-3 md:row-start-1 text-2xl text-gray-400 font-bold text-center hidden md:block"
-            >
-              ➔
-            </div>
-            <div
-              class="solution-component p-6 rounded-lg cursor-pointer card-hover-effect bg-white md:col-start-3"
-              data-target="smartcheckout"
-            >
-              <div class="text-5xl mb-4">💳</div>
-              <h3 class="text-xl font-bold">SmartCheckout</h3>
-              <p class="text-gray-500 text-sm">Gateway de Pagamento</p>
-            </div>
-          </div>
-
-          <div id="solution-details" class="mt-8 max-w-4xl mx-auto">
-            <div
-              id="detail-telcoadvisor"
-              class="solution-detail hidden p-8 telco-bg-accent-light rounded-lg"
-            >
-              <h4 class="text-2xl font-bold mb-2">
-                TelcoAdvisor: O Cérebro da Operação
-              </h4>
-              <p>
-                Esta IA é o núcleo do sistema. Ela monitora continuamente os
-                padrões de consumo e inadimplência de cada cliente para gerar
-                insights valiosos. Com base nessa análise, o TelcoAdvisor define
-                de forma autônoma a melhor ação ou oferta a ser feita,
-                garantindo uma gestão proativa e altamente personalizada da
-                jornada do cliente.
-              </p>
-            </div>
-            <div
-              id="detail-grace"
-              class="solution-detail hidden p-8 telco-bg-accent-light rounded-lg"
-            >
-              <h4 class="text-2xl font-bold mb-2">
-                Grace: A Interface de Comunicação
-              </h4>
-              <p>
-                Grace é o agente conversacional que executa a estratégia
-                definida pelo TelcoAdvisor. Através de canais familiares como
-                Chat e WhatsApp, ela apresenta a oferta ao cliente de maneira
-                clara e amigável, simplificando a interação e guiando-o
-                suavemente para a ação desejada, seja uma recarga, um upgrade ou
-                uma negociação.
-              </p>
-            </div>
-            <div
-              id="detail-smartcheckout"
-              class="solution-detail hidden p-8 telco-bg-accent-light rounded-lg"
-            >
-              <h4 class="text-2xl font-bold mb-2">
-                SmartCheckout: A Simplificação do Pagamento
-              </h4>
-              <p>
-                Como etapa final, o SmartCheckout oferece um gateway de
-                pagamento integrado, seguro e ágil. Ele elimina a fricção do
-                processo de pagamento, permitindo que o cliente conclua a
-                transação com poucos cliques, diretamente na conversa,
-                transformando a intenção em ação de forma imediata e eficiente.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="jornadas" class="py-16 bg-white">
-        <div class="container mx-auto px-6">
-          <div class="text-center mb-12">
-            <h2 class="text-3xl md:text-4xl font-bold">
-              Simulação de Jornadas no WhatsApp
-            </h2>
-            <p class="mt-4 text-gray-600 max-w-2xl mx-auto">
-              Selecione um perfil para ver uma simulação animada de como a Grace
-              interage com o cliente e resolve suas necessidades diretamente no
-              WhatsApp.
-            </p>
-          </div>
-          <div class="flex flex-wrap justify-center gap-2 md:gap-4 mb-8">
-            <button
-              class="journey-btn active px-4 py-2 md:px-6 md:py-3 rounded-full font-semibold transition-all"
-              data-journey="douglas"
-            >
-              Douglas (O Esporádico)
-            </button>
-            <button
-              class="journey-btn px-4 py-2 md:px-6 md:py-3 rounded-full font-semibold transition-all"
-              data-journey="ana"
-            >
-              Ana (A Retenção)
-            </button>
-            <button
-              class="journey-btn px-4 py-2 md:px-6 md:py-3 rounded-full font-semibold transition-all"
-              data-journey="ademar"
-            >
-              Ademar (A Inadimplência)
-            </button>
-            <button
-              class="journey-btn px-4 py-2 md:px-6 md:py-3 rounded-full font-semibold transition-all"
-              data-journey="mariana"
-            >
-              Mariana (Anti-Churn)
-            </button>
-          </div>
-          <div class="flex justify-center">
-            <div class="phone-mockup">
-              <div class="phone-screen">
-                <div
-                  class="bg-teal-700 text-white p-3 flex items-center shadow-md z-10"
-                >
-                  <div
-                    class="w-10 h-10 bg-gray-300 rounded-full mr-3 flex items-center justify-center text-teal-700 font-bold text-xl"
-                  >
-                    G
-                  </div>
-                  <div>
-                    <h3 class="font-semibold">Grace</h3>
-                    <p class="text-xs">online</p>
-                  </div>
+        <section id="desafio" class="py-16 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold">O Desafio: Uma Fricção de Dois Lados</h2>
+                    <p class="mt-4 text-gray-600 max-w-2xl mx-auto">A perda de recorrência em telecomunicações nasce de um conflito entre as necessidades do cliente e os objetivos da operadora. Identificamos as dores de cada lado para criar uma solução que beneficia ambos.</p>
                 </div>
-                <div
-                  id="chat-messages"
-                  class="flex-1 p-4 flex flex-col space-y-3 overflow-y-auto"
-                ></div>
-                <div id="typing-indicator-container" class="p-4 hidden">
-                  <div
-                    class="chat-bubble-grace p-3 rounded-lg max-w-xs typing-indicator"
-                  >
-                    <span
-                      class="inline-block w-2 h-2 bg-gray-400 rounded-full"
-                    ></span>
-                    <span
-                      class="inline-block w-2 h-2 bg-gray-400 rounded-full"
-                    ></span>
-                    <span
-                      class="inline-block w-2 h-2 bg-gray-400 rounded-full"
-                    ></span>
-                  </div>
+                <div class="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                    <div class="bg-rose-50 p-8 rounded-lg border border-rose-200">
+                        <h3 class="text-2xl font-bold text-rose-800 mb-4 flex items-center">
+                            <span class="text-3xl mr-3">😟</span> A Dor do Cliente
+                        </h3>
+                        <ul class="space-y-3 text-gray-700 list-inside">
+                            <li><span class="font-semibold text-rose-700">Conexão Interrompida:</span> Clientes pré-pagos ficam offline em momentos críticos.</li>
+                            <li><span class="font-semibold text-rose-700">Surpresas no Limite:</span> Usuários pós-pagos atingem o limite de dados de forma inesperada.</li>
+                            <li><span class="font-semibold text-rose-700">Processo de Recarga:</span> A necessidade de recarregar manualmente gera fricção e pode ser esquecida.</li>
+                        </ul>
+                    </div>
+                    <div class="bg-blue-50 p-8 rounded-lg border border-blue-200">
+                        <h3 class="text-2xl font-bold text-blue-800 mb-4 flex items-center">
+                            <span class="text-3xl mr-3">🏢</span> A Dor da Operadora
+                        </h3>
+                        <ul class="space-y-3 text-gray-700 list-inside">
+                            <li><span class="font-semibold text-blue-700">Clientes Esporádicos:</span> Alta taxa de clientes que não geram receita previsível.</li>
+                            <li><span class="font-semibold text-blue-700">Perda de Receita:</span> Prejuízos significativos por inadimplência e cancelamentos (churn).</li>
+                            <li><span class="font-semibold text-blue-700">Custo de Retenção:</span> Altas despesas para reter clientes e renegociar dívidas.</li>
+                        </ul>
+                    </div>
                 </div>
-              </div>
             </div>
-          </div>
-        </div>
-      </section>
+        </section>
+        
+        <section id="solucao" class="py-16">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold">A Solução: Um Ecossistema de IA Integrado</h2>
+                    <p class="mt-4 text-gray-600 max-w-2xl mx-auto">Para resolver o desafio, criamos um ecossistema inteligente que opera de forma proativa. Cada componente tem um papel crucial na jornada do cliente. Clique nos componentes para saber mais.</p>
+                </div>
 
-      <section id="metricas" class="py-16">
-        <div class="container mx-auto px-6">
-          <div class="text-center mb-12">
-            <h2 class="text-3xl md:text-4xl font-bold">
-              Medindo o Sucesso: Objetivos e Métricas Chave
-            </h2>
-            <p class="mt-4 text-gray-600 max-w-2xl mx-auto">
-              O impacto do TelcoAdvisor é mensurável através de métricas de
-              negócio que refletem diretamente o aumento da receita e a
-              satisfação do cliente.
-            </p>
-          </div>
+                <div class="max-w-4xl mx-auto grid md:grid-cols-3 gap-4 text-center items-center">
+                    <div class="solution-component p-6 rounded-lg cursor-pointer card-hover-effect bg-white" data-target="telcoadvisor">
+                        <div class="text-5xl mb-4">🧠</div>
+                        <h3 class="text-xl font-bold">TelcoAdvisor</h3>
+                        <p class="text-gray-500 text-sm">Motor de IA</p>
+                    </div>
+                    <div class="text-2xl text-gray-400 font-bold hidden md:block">➔</div>
+                    <div class="solution-component p-6 rounded-lg cursor-pointer card-hover-effect bg-white" data-target="grace">
+                        <div class="text-5xl mb-4">💬</div>
+                        <h3 class="text-xl font-bold">Grace</h3>
+                        <p class="text-gray-500 text-sm">Agente Conversacional</p>
+                    </div>
+                    <div class="col-span-1 md:col-span-3 text-2xl text-gray-400 font-bold text-center my-4 md:hidden">↓</div>
+                    <div class="col-span-1 md:col-start-2 md:col-span-1 text-2xl text-gray-400 font-bold text-center my-4 hidden md:block">↓</div>
+                    <div class="col-span-1 md:col-start-3 md:row-start-1 text-2xl text-gray-400 font-bold text-center hidden md:block">➔</div>
+                    <div class="solution-component p-6 rounded-lg cursor-pointer card-hover-effect bg-white md:col-start-3" data-target="smartcheckout">
+                        <div class="text-5xl mb-4">💳</div>
+                        <h3 class="text-xl font-bold">SmartCheckout</h3>
+                        <p class="text-gray-500 text-sm">Gateway de Pagamento</p>
+                    </div>
+                </div>
 
-          <div class="grid md:grid-cols-2 gap-8 md:gap-12">
-            <div>
-              <h3 class="text-xl font-bold text-center mb-4">
-                Aumento da Recorrência e Retenção
-              </h3>
-              <div class="chart-container">
-                <canvas id="retentionChart"></canvas>
-              </div>
-              <p class="text-center text-gray-600 mt-4 text-sm">
-                Compara a taxa de conversão de clientes esporádicos e a redução
-                do churn.
-              </p>
+                <div id="solution-details" class="mt-8 max-w-4xl mx-auto">
+                    <div id="detail-telcoadvisor" class="solution-detail hidden p-8 telco-bg-accent-light rounded-lg">
+                        <h4 class="text-2xl font-bold mb-2">TelcoAdvisor: O Cérebro da Operação</h4>
+                        <p>Esta IA é o núcleo do sistema. Ela monitora continuamente os padrões de consumo e inadimplência de cada cliente para gerar insights valiosos. Com base nessa análise, o TelcoAdvisor define de forma autônoma a melhor ação ou oferta a ser feita, garantindo uma gestão proativa e altamente personalizada da jornada do cliente.</p>
+                    </div>
+                    <div id="detail-grace" class="solution-detail hidden p-8 telco-bg-accent-light rounded-lg">
+                        <h4 class="text-2xl font-bold mb-2">Grace: A Interface de Comunicação</h4>
+                        <p>Grace é o agente conversacional que executa a estratégia definida pelo TelcoAdvisor. Através de canais familiares como Chat e WhatsApp, ela apresenta a oferta ao cliente de maneira clara e amigável, simplificando a interação e guiando-o suavemente para a ação desejada, seja uma recarga, um upgrade ou uma negociação.</p>
+                    </div>
+                    <div id="detail-smartcheckout" class="solution-detail hidden p-8 telco-bg-accent-light rounded-lg">
+                        <h4 class="text-2xl font-bold mb-2">SmartCheckout: A Simplificação do Pagamento</h4>
+                        <p>Como etapa final, o SmartCheckout oferece um gateway de pagamento integrado, seguro e ágil. Ele elimina a fricção do processo de pagamento, permitindo que o cliente conclua a transação com poucos cliques, diretamente na conversa, transformando a intenção em ação de forma imediata e eficiente.</p>
+                    </div>
+                </div>
             </div>
-            <div>
-              <h3 class="text-xl font-bold text-center mb-4">
-                Redução da Inadimplência
-              </h3>
-              <div class="chart-container">
-                <canvas id="inadimplenciaChart"></canvas>
-              </div>
-              <p class="text-center text-gray-600 mt-4 text-sm">
-                Mostra a eficácia da negociação automatizada na redução de
-                débitos.
-              </p>
+        </section>
+
+        <section id="jornadas" class="py-16 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold">Simulação de Jornadas no WhatsApp</h2>
+                    <p class="mt-4 text-gray-600 max-w-2xl mx-auto">Selecione um perfil para ver uma simulação animada de como a Grace interage com o cliente e resolve suas necessidades diretamente no WhatsApp.</p>
+                </div>
+                <div class="flex flex-wrap justify-center gap-2 md:gap-4 mb-8">
+                    <button class="journey-btn active px-4 py-2 md:px-6 md:py-3 rounded-full font-semibold transition-all" data-journey="douglas">Douglas (O Esporádico)</button>
+                    <button class="journey-btn px-4 py-2 md:px-6 md:py-3 rounded-full font-semibold transition-all" data-journey="ana">Ana (A Retenção)</button>
+                    <button class="journey-btn px-4 py-2 md:px-6 md:py-3 rounded-full font-semibold transition-all" data-journey="ademar">Ademar (A Inadimplência)</button>
+                    <button class="journey-btn px-4 py-2 md:px-6 md:py-3 rounded-full font-semibold transition-all" data-journey="mariana">Mariana (Anti-Churn)</button>
+                </div>
+                <div class="flex justify-center">
+                    <div class="phone-mockup">
+                        <div class="phone-screen">
+                            <div class="bg-teal-700 text-white p-3 flex items-center shadow-md z-10">
+                                <div class="w-10 h-10 bg-gray-300 rounded-full mr-3 flex items-center justify-center text-teal-700 font-bold text-xl">G</div>
+                                <div>
+                                    <h3 class="font-semibold">Grace</h3>
+                                    <p class="text-xs">online</p>
+                                </div>
+                            </div>
+                            <div id="chat-messages" class="flex-1 p-4 flex flex-col space-y-3 overflow-y-auto">
+                            </div>
+                            <div id="typing-indicator-container" class="p-4 hidden">
+                                <div class="chat-bubble-grace p-3 rounded-lg max-w-xs typing-indicator">
+                                    <span class="inline-block w-2 h-2 bg-gray-400 rounded-full"></span>
+                                    <span class="inline-block w-2 h-2 bg-gray-400 rounded-full"></span>
+                                    <span class="inline-block w-2 h-2 bg-gray-400 rounded-full"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-      </section>
+        </section>
+
+        <section id="metricas" class="py-16">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold">Medindo o Sucesso: Objetivos e Métricas Chave</h2>
+                    <p class="mt-4 text-gray-600 max-w-2xl mx-auto">O impacto do TelcoAdvisor é mensurável através de métricas de negócio que refletem diretamente o aumento da receita e a satisfação do cliente.</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8 md:gap-12">
+                    <div>
+                        <h3 class="text-xl font-bold text-center mb-4">Aumento da Recorrência e Retenção</h3>
+                        <div class="chart-container">
+                            <canvas id="retentionChart"></canvas>
+                        </div>
+                         <p class="text-center text-gray-600 mt-4 text-sm">Compara a taxa de conversão de clientes esporádicos e a redução do churn.</p>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-center mb-4">Redução da Inadimplência</h3>
+                        <div class="chart-container">
+                             <canvas id="inadimplenciaChart"></canvas>
+                        </div>
+                        <p class="text-center text-gray-600 mt-4 text-sm">Mostra a eficácia da negociação automatizada na redução de débitos.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
-
+    
     <footer class="bg-gray-800 text-white py-8">
-      <div class="container mx-auto px-6 text-center">
-        <div class="text-xl font-bold mb-2">
-          <span class="telco-accent">Telco</span>Advisor
+        <div class="container mx-auto px-6 text-center">
+             <div class="text-xl font-bold mb-2">
+                <span class="telco-accent">Telco</span>Advisor
+            </div>
+            <p>&copy; 2025 TelcoAdvisor. Revolucionando a experiência telco.</p>
         </div>
-        <p>&copy; 2025 TelcoAdvisor. Revolucionando a experiência telco.</p>
-      </div>
     </footer>
 
     <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        const solutionComponents = document.querySelectorAll(
-          ".solution-component"
-        );
-        const solutionDetails = document.querySelectorAll(".solution-detail");
+        document.addEventListener('DOMContentLoaded', () => {
+            const solutionComponents = document.querySelectorAll('.solution-component');
+            const solutionDetails = document.querySelectorAll('.solution-detail');
 
-        solutionComponents.forEach((component) => {
-          component.addEventListener("click", () => {
-            const targetId = `detail-${component.dataset.target}`;
-            solutionDetails.forEach((detail) => {
-              if (detail.id === targetId) {
-                detail.classList.toggle("hidden");
-              } else {
-                detail.classList.add("hidden");
-              }
+            solutionComponents.forEach(component => {
+                component.addEventListener('click', () => {
+                    const targetId = `detail-${component.dataset.target}`;
+                    solutionDetails.forEach(detail => {
+                        if (detail.id === targetId) {
+                            detail.classList.toggle('hidden');
+                        } else {
+                            detail.classList.add('hidden');
+                        }
+                    });
+                });
             });
-          });
-        });
 
-        const journeysData = {
-          douglas: [
-            {
-              sender: "grace",
-              text: "Olá, Douglas! Notei que seus créditos estão acabando. Não fique na mão!",
-            },
-            {
-              sender: "grace",
-              text: "Que tal fazer uma recarga agora de forma rápida e segura?",
-              type: "payment",
-              details: { title: "Recarga R$20,00", button: "Recarregar Agora" },
-            },
-            { sender: "user", text: "Opa, valeu por avisar! Vou recarregar." },
-            {
-              sender: "grace",
-              text: "Pagamento confirmado! Seus créditos já estão disponíveis. ✅",
-            },
-            {
-              sender: "grace",
-              text: "Percebi que você recarrega com frequência. Que tal um plano pós-pago que se encaixa no seu gasto, com mais benefícios?",
-            },
-          ],
-          ana: [
-            {
-              sender: "grace",
-              text: "Olá, Ana. Notei que você atingiu 100% do seu pacote de dados.",
-            },
-            {
-              sender: "grace",
-              text: "Para você não parar de navegar, posso adicionar um pacote extra de 2GB ou fazer um upgrade no seu plano. O que prefere?",
-            },
-            {
-              sender: "user",
-              text: "Preciso de um pacote extra pra agora, por favor.",
-            },
-            {
-              sender: "grace",
-              text: "Combinado! Adicionando pacote extra de 2GB.",
-              type: "payment",
-              details: {
-                title: "Pacote Extra 2GB",
-                button: "Confirmar Pagamento",
-              },
-            },
-            {
-              sender: "grace",
-              text: "Prontinho! Pacote de dados ativado. ✅ Continue conectada!",
-            },
-          ],
-          ademar: [
-            {
-              sender: "grace",
-              text: "Olá, Ademar. Vi que sua fatura deste mês está em aberto.",
-            },
-            {
-              sender: "grace",
-              text: "Entendo que imprevistos acontecem. Que tal negociarmos? Tenho uma opção com desconto para pagamento imediato.",
-            },
-            { sender: "user", text: "Gostei do desconto. Quero pagar." },
-            {
-              sender: "grace",
-              text: "Excelente! Aqui está o link de pagamento com o valor atualizado.",
-              type: "payment",
-              details: {
-                title: "Fatura com Desconto",
-                button: "Pagar com Desconto",
-              },
-            },
-            {
-              sender: "grace",
-              text: "Pagamento recebido, Ademar! Tudo certo por aqui. ✅",
-            },
-          ],
-          mariana: [
-            { sender: "user", text: "Gostaria de cancelar meu plano." },
-            {
-              sender: "grace",
-              text: "Olá, Mariana. Lamento que queira nos deixar. Antes de prosseguir, analisei seu uso e vi que um plano mais econômico seria perfeito para você.",
-            },
-            {
-              sender: "grace",
-              text: 'Posso alterar seu plano para o "Plano Conectado" com 50% de desconto na primeira fatura. Você continua com a gente e economiza. O que acha?',
-            },
-            {
-              sender: "user",
-              text: "Hmm, essa proposta é interessante. Aceito!",
-            },
-            {
-              sender: "grace",
-              text: "Que ótima notícia, Mariana! Seu plano foi alterado com sucesso. ✅ Bem-vinda de volta!",
-            },
-          ],
-        };
+            const journeysData = {
+                douglas: [
+                    { sender: 'grace', text: 'Olá, Douglas! Notei que seus créditos estão acabando. Não fique na mão!' },
+                    { sender: 'grace', text: 'Que tal fazer uma recarga agora de forma rápida e segura?', type: 'payment', details: { title: 'Recarga R$20,00', button: 'Recarregar Agora' } },
+                    { sender: 'user', text: 'Opa, valeu por avisar! Vou recarregar.' },
+                    { sender: 'grace', text: 'Pagamento confirmado! Seus créditos já estão disponíveis. ✅' },
+                    { sender: 'grace', text: 'Percebi que você recarrega com frequência. Que tal um plano pós-pago que se encaixa no seu gasto, com mais benefícios?' }
+                ],
+                ana: [
+                    { sender: 'grace', text: 'Olá, Ana. Notei que você atingiu 100% do seu pacote de dados.' },
+                    { sender: 'grace', text: 'Para você não parar de navegar, posso adicionar um pacote extra de 2GB ou fazer um upgrade no seu plano. O que prefere?' },
+                    { sender: 'user', text: 'Preciso de um pacote extra pra agora, por favor.' },
+                    { sender: 'grace', text: 'Combinado! Adicionando pacote extra de 2GB.', type: 'payment', details: { title: 'Pacote Extra 2GB', button: 'Confirmar Pagamento' } },
+                    { sender: 'grace', text: 'Prontinho! Pacote de dados ativado. ✅ Continue conectada!' }
+                ],
+                ademar: [
+                    { sender: 'grace', text: 'Olá, Ademar. Vi que sua fatura deste mês está em aberto.' },
+                    { sender: 'grace', text: 'Entendo que imprevistos acontecem. Que tal negociarmos? Tenho uma opção com desconto para pagamento imediato.' },
+                    { sender: 'user', text: 'Gostei do desconto. Quero pagar.' },
+                    { sender: 'grace', text: 'Excelente! Aqui está o link de pagamento com o valor atualizado.', type: 'payment', details: { title: 'Fatura com Desconto', button: 'Pagar com Desconto' } },
+                    { sender: 'grace', text: 'Pagamento recebido, Ademar! Tudo certo por aqui. ✅' }
+                ],
+                mariana: [
+                    { sender: 'user', text: 'Gostaria de cancelar meu plano.' },
+                    { sender: 'grace', text: 'Olá, Mariana. Lamento que queira nos deixar. Antes de prosseguir, analisei seu uso e vi que um plano mais econômico seria perfeito para você.' },
+                    { sender: 'grace', text: 'Posso alterar seu plano para o "Plano Conectado" com 50% de desconto na primeira fatura. Você continua com a gente e economiza. O que acha?' },
+                    { sender: 'user', text: 'Hmm, essa proposta é interessante. Aceito!' },
+                    { sender: 'grace', text: 'Que ótima notícia, Mariana! Seu plano foi alterado com sucesso. ✅ Bem-vinda de volta!' }
+                ]
+            };
+            
+            const journeyBtns = document.querySelectorAll('.journey-btn');
+            const chatMessagesContainer = document.getElementById('chat-messages');
+            const typingIndicator = document.getElementById('typing-indicator-container');
+            let currentTimeout;
 
-        const journeyBtns = document.querySelectorAll(".journey-btn");
-        const chatMessagesContainer = document.getElementById("chat-messages");
-        const typingIndicator = document.getElementById(
-          "typing-indicator-container"
-        );
-        let currentTimeout;
-
-        function appendMessage(message) {
-          const bubble = document.createElement("div");
-          bubble.className = `chat-bubble p-3 rounded-lg max-w-xs shadow ${
-            message.sender === "grace"
-              ? "chat-bubble-grace"
-              : "chat-bubble-user"
-          }`;
-
-          if (message.type === "payment") {
-            bubble.innerHTML = `
+            function appendMessage(message) {
+                const bubble = document.createElement('div');
+                bubble.className = `chat-bubble p-3 rounded-lg max-w-xs shadow ${message.sender === 'grace' ? 'chat-bubble-grace' : 'chat-bubble-user'}`;
+                
+                if (message.type === 'payment') {
+                    bubble.innerHTML = `
                         <div class="font-bold text-gray-800">${message.details.title}</div>
                         <p class="text-sm text-gray-600 mb-3">${message.text}</p>
                         <button class="w-full text-center p-2 rounded-lg telco-bg-accent text-white font-semibold">${message.details.button}</button>
                     `;
-          } else {
-            bubble.textContent = message.text;
-          }
+                } else {
+                    bubble.textContent = message.text;
+                }
+                
+                chatMessagesContainer.appendChild(bubble);
+                chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+            }
 
-          chatMessagesContainer.appendChild(bubble);
-          chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
-        }
+            function runSimulation(messages) {
+                clearTimeout(currentTimeout);
+                chatMessagesContainer.innerHTML = '';
+                let delay = 500;
 
-        function runSimulation(messages) {
-          clearTimeout(currentTimeout);
-          chatMessagesContainer.innerHTML = "";
-          let delay = 500;
+                messages.forEach((msg, index) => {
+                    currentTimeout = setTimeout(() => {
+                        typingIndicator.classList.add('hidden');
+                        appendMessage(msg);
+                        
+                        if (messages[index + 1] && messages[index + 1].sender === 'grace') {
+                           typingIndicator.classList.remove('hidden');
+                           chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+                        }
 
-          messages.forEach((msg, index) => {
-            currentTimeout = setTimeout(() => {
-              typingIndicator.classList.add("hidden");
-              appendMessage(msg);
+                    }, delay);
+                    delay += msg.text.length * 50 + 1000;
+                });
+            }
 
-              if (
-                messages[index + 1] &&
-                messages[index + 1].sender === "grace"
-              ) {
-                typingIndicator.classList.remove("hidden");
-                chatMessagesContainer.scrollTop =
-                  chatMessagesContainer.scrollHeight;
-              }
-            }, delay);
-            delay += msg.text.length * 50 + 1000;
-          });
-        }
-
-        journeyBtns.forEach((btn) => {
-          btn.addEventListener("click", () => {
-            journeyBtns.forEach((b) => b.classList.remove("active"));
-            btn.classList.add("active");
-            const journeyName = btn.dataset.journey;
-            runSimulation(journeysData[journeyName]);
-          });
-        });
-
-        runSimulation(journeysData["douglas"]);
-
-        const retentionCtx = document
-          .getElementById("retentionChart")
-          .getContext("2d");
-        new Chart(retentionCtx, {
-          type: "bar",
-          data: {
-            labels: [
-              "Conversão de Esporádicos",
-              "Retenção Pós-Intervenção",
-              "Aumento de LTV",
-            ],
-            datasets: [
-              {
-                label: "Antes da IA",
-                data: [12, 85, 15],
-                backgroundColor: "rgba(200, 200, 200, 0.6)",
-                borderColor: "rgba(200, 200, 200, 1)",
-                borderWidth: 1,
-              },
-              {
-                label: "Com TelcoAdvisor",
-                data: [35, 96, 40],
-                backgroundColor: "rgba(0, 119, 182, 0.6)",
-                borderColor: "rgba(0, 119, 182, 1)",
-                borderWidth: 1,
-              },
-            ],
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-              y: {
-                beginAtZero: true,
-                ticks: { callback: (value) => value + "%" },
-              },
-            },
-            plugins: {
-              tooltip: {
-                callbacks: {
-                  label: (context) =>
-                    `${context.dataset.label}: ${context.raw}%`,
+            journeyBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    journeyBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    const journeyName = btn.dataset.journey;
+                    runSimulation(journeysData[journeyName]);
+                });
+            });
+            
+            runSimulation(journeysData['douglas']);
+            
+            const retentionCtx = document.getElementById('retentionChart').getContext('2d');
+            new Chart(retentionCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Conversão de Esporádicos', 'Retenção Pós-Intervenção', 'Aumento de LTV'],
+                    datasets: [{
+                        label: 'Antes da IA',
+                        data: [12, 85, 15],
+                        backgroundColor: 'rgba(200, 200, 200, 0.6)',
+                        borderColor: 'rgba(200, 200, 200, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Com TelcoAdvisor',
+                        data: [35, 96, 40],
+                        backgroundColor: 'rgba(0, 119, 182, 0.6)',
+                        borderColor: 'rgba(0, 119, 182, 1)',
+                        borderWidth: 1
+                    }]
                 },
-              },
-            },
-          },
-        });
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: true, ticks: { callback: (value) => value + '%' } } },
+                    plugins: { tooltip: { callbacks: { label: (context) => `${context.dataset.label}: ${context.raw}%` } } }
+                }
+            });
 
-        const inadimplenciaCtx = document
-          .getElementById("inadimplenciaChart")
-          .getContext("2d");
-        new Chart(inadimplenciaCtx, {
-          type: "bar",
-          data: {
-            labels: [
-              "Débitos Renegociados",
-              "Débitos Quitados",
-              "Churn por Dívida",
-            ],
-            datasets: [
-              {
-                label: "Antes da IA",
-                data: [20, 15, 18],
-                backgroundColor: "rgba(200, 200, 200, 0.6)",
-                borderColor: "rgba(200, 200, 200, 1)",
-                borderWidth: 1,
-              },
-              {
-                label: "Com TelcoAdvisor",
-                data: [75, 60, 4],
-                backgroundColor: "rgba(0, 119, 182, 0.6)",
-                borderColor: "rgba(0, 119, 182, 1)",
-                borderWidth: 1,
-              },
-            ],
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            indexAxis: "y",
-            scales: {
-              x: {
-                beginAtZero: true,
-                ticks: { callback: (value) => value + "%" },
-              },
-            },
-            plugins: {
-              tooltip: {
-                callbacks: {
-                  label: (context) =>
-                    `${context.dataset.label}: ${context.raw}%`,
+            const inadimplenciaCtx = document.getElementById('inadimplenciaChart').getContext('2d');
+            new Chart(inadimplenciaCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Débitos Renegociados', 'Débitos Quitados', 'Churn por Dívida'],
+                    datasets: [{
+                        label: 'Antes da IA',
+                        data: [20, 15, 18],
+                        backgroundColor: 'rgba(200, 200, 200, 0.6)',
+                        borderColor: 'rgba(200, 200, 200, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Com TelcoAdvisor',
+                        data: [75, 60, 4],
+                        backgroundColor: 'rgba(0, 119, 182, 0.6)',
+                        borderColor: 'rgba(0, 119, 182, 1)',
+                        borderWidth: 1
+                    }]
                 },
-              },
-            },
-          },
+                 options: {
+                    responsive: true, maintainAspectRatio: false, indexAxis: 'y',
+                    scales: { x: { beginAtZero: true, ticks: { callback: (value) => value + '%' } } },
+                    plugins: { tooltip: { callbacks: { label: (context) => `${context.dataset.label}: ${context.raw}%` } } }
+                }
+            });
         });
-      });
     </script>
-  </body>
+</body>
 </html>
+
+
+
